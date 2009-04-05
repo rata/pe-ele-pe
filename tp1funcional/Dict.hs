@@ -1,4 +1,4 @@
---module Dict(Dict, emptyDict, extendDict, lookupDict, removeDict, makeDict) where
+module Dict(Dict, emptyDict, extendDict, lookupDict, removeDict, makeDict) where
 
 -- Implementación de diccionarios usando funciones.
 
