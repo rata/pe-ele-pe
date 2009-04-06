@@ -43,9 +43,9 @@ fLet :: ProgramDef -> Environment -> VarId -> Value -> Exp -> Value
 fLet p en var v1 e1 = eval' p (extendDict en var v1) e1
 
 call :: ProgramDef -> Environment -> FuncId -> [Value] ->Value
-call p en f vs e = eval' p nen (getExp (fromJust (lookupDict f p)))
-	where nen = foldr (\ t d -> extendDict d (fst t) (snd t)) en (toTupla (getParms (fromJust (lookupDict f p))) vs) 
---	      defFunc = fromJust (lookupDict f p)
+call p en f vs = eval' p nen (getExp defFunc)
+	where nen = foldr (\t d -> extendDict d (fst t) (snd t)) en (toTupla (getParms defFunc) vs) 
+	      defFunc = fromJust (lookupDict p f)
 
 getExp (FuncDef _ exp) = exp
 getParms (FuncDef ls _ ) = ls
