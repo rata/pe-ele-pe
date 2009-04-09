@@ -48,7 +48,7 @@ fLet var f1 f2 en = f2 (extendDictByV en var (f1 en))
 
 call :: ProgramDef -> FuncId -> [(Environment -> Value)] -> Environment -> Value
 call p f fs en = eval' p (getExp defFunc) nen
-	where 	nen = foldr (\t d -> extendDictByV d (fst t) (snd t)) en (zip (getParms defFunc) vs)
+	where 	nen = foldr (\t d -> extendDictByV d (fst t) (snd t)) emptyDict (zip (getParms defFunc) vs)
 		vs = map (\a -> a en ) fs
 		defFunc = fromJust (lookupDict p f)
 
