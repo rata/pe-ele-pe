@@ -3,6 +3,7 @@ import Dict
 import Lenguaje
 import Parser
 import ByValue
+import ByName
 import Test.HUnit
 
 def :: String -> String -> (FuncId, FuncDef)
@@ -33,7 +34,12 @@ definiciones = makeDict [
 	def "suma(x,y)"
 	"x + y",
 	def "leticia(x,y,z)"
-	"let x=4 in x + suma(x,z) * y"
+	"let x=4 in x + suma(x,z) * y",
+	def "sellama(x)"
+	" ifzero x  	\
+	\ then 3 	\
+	\ else 		\
+	\ 2"
   ]
 
 main1 = parser "fact(5)"
@@ -41,20 +47,23 @@ main2 = parser "fib(4)"
 main3 = parser "primero(4,colgate(5))"
 main4 = parser "colgate(5)"
 main5 = parser "suma(7,primero(4,colgate(5)))"
-main6 = parser "ifzero 0 then \
-		\ 4 else colgate(3)"
+main6 = parser "ifzero 1 then \
+		\ 4 else 3"
 main7 = parser "let x=2 in suma(x,x)"
 main8 = parser "let x=2 in let x=3 in suma(x,x)"
 main9 = parser "let x=5 in leticia(1,2,3)"
 main10 = parser "let x=5 in leticia(1,x,3)"
+main11 = parser "sellama(2)"
+main12 = parser "suma(2,3)"
 
 
 
+testBV = (runTestTT.test) testCBV
+testBN = (runTestTT.test) testCBN
 
-testBV = runTestTT test1
-test1 = test [eval definiciones main1  ~=? 120
+test1 = test [ eval definiciones main1 ~=?  120
 		, eval definiciones main2  ~=? 5 
-		, eval definiciones main3  ~=? 4 
+--		, eval definiciones main3  ~=? 4 
 --		, eval definiciones main4  ~=? 4 
 --		, eval definiciones main5  ~=? 4
 		, eval definiciones main6  ~=? 4  
@@ -64,5 +73,21 @@ test1 = test [eval definiciones main1  ~=? 120
 		, eval definiciones main10  ~=? 39
 		 ]
 
---test = eval' prog exp env
+testcases :: [(ProgramDef, Exp, Int)]
+testcases =  [ ( definiciones, main1,  120)
+		, ( definiciones, main2  , 5)
+--		, ( definiciones, main3, 4) 
+--		, ( definiciones, main4, 4) 
+--		, ( definiciones, main5, 4)
+		, ( definiciones, main6 , 3) 
+		, ( definiciones, main7 , 4)
+		, ( definiciones, main8 , 6)
+		, ( definiciones, main9 , 18)
+		, ( definiciones, main10,  39)
+		, ( definiciones, main11, 2)
+		, ( definiciones, main12, 5)
+		 ]
 
+testCBV = map (\(a,b,c) -> (eval a b ~=? c) ) testcases
+--test = eval' prog exp env
+testCBN = map (\(a,b,c) -> (reduce a b ~=? c) ) testcases
