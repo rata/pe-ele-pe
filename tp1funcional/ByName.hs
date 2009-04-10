@@ -1,4 +1,4 @@
---module ByName(reduce) where
+module ByName(reduce) where
 
 import Lenguaje
 import Dict
@@ -15,9 +15,9 @@ substitute :: Exp -> Substitution -> Exp
 substitute e1 s = foldExp (\v _ -> Const v) gv gbinOp gifZ gLet gCall e1 s
 
 gv :: VarId -> Substitution -> Exp
-gv a s	| isNothing v = Var a
-	| otherwise = fromJust v
-		where v = lookupDict s a
+gv a s	| isNothing e = Var a
+	| otherwise = fromJust e
+		where e = lookupDict s a
 
 gbinOp :: Op -> (Substitution -> Exp) -> (Substitution -> Exp) -> Substitution -> Exp
 gbinOp o e1 e2 s = BinOp o (e1 s) (e2 s)
@@ -29,7 +29,7 @@ gLet :: VarId -> (Substitution -> Exp) -> (Substitution -> Exp) -> Substitution 
 gLet v e1 e2 s = Let v (e1 s) (e2 (removeDict s v))
 
 gCall :: FuncId -> [(Substitution -> Exp)] -> Substitution -> Exp
-gCall f es _ = Call f (map (\e -> (e emptyDict)) es )
+gCall f es s = Call f (map (\e -> e s ) es )
 
 -- *** Ejercicio 6 ***
 
@@ -48,7 +48,7 @@ reduceOneStep p e = snd (reduceOneStep' p e)
 --rBinOp op (Done x) saraza = BinOp op x saraza
  
 reduceOneStep' :: ProgramDef -> Exp -> (Exp, Result Exp)
-reduceOneStep' p e = foldExp (\v -> (Const v, Done)) (error "variable libre")  rBinOp rifZ rLet (rCall p) e
+reduceOneStep' p e = foldExp (\v -> (Const v, Done)) (\v -> (Var v, Done)) rBinOp rifZ rLet (rCall p) e
 
 rBinOp :: Op -> (Exp, Result Exp) -> (Exp, Result Exp) -> (Exp, Result Exp)
 rBinOp op (e1, ReducesTo x)  (e2, _) = ((BinOp op e1 e2), ReducesTo (BinOp op x e2))
@@ -63,19 +63,19 @@ op2Func Sub = (-)
 
 rifZ :: (Exp, Result Exp) -> (Exp, Result Exp) -> (Exp, Result Exp) -> (Exp, Result Exp)
 rifZ (e1, ReducesTo x) (e2, _) (e3, _) = (IfZero e1 e2 e3, ReducesTo (IfZero x e2 e3))
-rifZ (Const 0, Done) (e2, _) (e3, _) = (IfZero (Const 0) e2 e3, ReducesTo e2)
-rifZ (e1, Done) (e2, _) (e3, _) = (IfZero e1 e2 e3, ReducesTo e2)
+rifZ ((Const 0), Done) (e2, _) (e3, _) = (IfZero (Const 0) e2 e3, ReducesTo e2)
+rifZ (e1, Done) (e2, _) (e3, _) = (IfZero e1 e2 e3, ReducesTo e3)
 
 
 rLet :: VarId -> (Exp, Result Exp) -> (Exp, Result Exp) -> (Exp, Result Exp)
-rLet v (e1, r1) (e2, r2) = (Let v e1 e2, ReducesTo (substitute e2 (makeDict [(v, e1)])))
+rLet v (e1, _) (e2, _) = (Let v e1 e2, ReducesTo (substitute e2 (makeDict [(v,e1)] )))
 
 rCall :: ProgramDef -> FuncId -> [(Exp, Result Exp)] -> (Exp, Result Exp)
 rCall p f xs = (Call f params, g)
-	where   g = ReducesTo h
+	where   g = ReducesTo (substitute e s)
 		e = getExp defFunc
-		h = substitute e s
 		s = makeDict (zip (getParms defFunc) params)
+--		s = foldr (\t d -> extendDict d (fst t) (snd t)) emptyDict (zip (getParms defFunc) params)
 		defFunc = fromJust (lookupDict p f)
 		params = fst (unzip xs)
 
@@ -90,18 +90,19 @@ getParms (FuncDef ls _ ) = ls
 -- Reduce la expresión a forma normal, aplicando
 -- reduceOneStep tantas veces como sea necesario.
 reduce :: ProgramDef -> Exp -> Value
-reduce p e = (getValue.res2Exp) (last (tk))
-	where   g (ReducesTo _) = True
+reduce p e = getValue (res2Exp (last (tk)))
+	where	tk = takeWhile g (iterate rOs (ReducesTo e))
+		rOs re = reduceOneStep p (res2Exp re)
+		g (ReducesTo _) = True
 		g _             = False
 		getValue (Const x) = x
-		tk = takeWhile g (iterate ((reduceOneStep p).res2Exp) (ReducesTo e))
 				
-
-reduci :: ProgramDef -> Result Exp-> Result Exp
-reduci p (ReducesTo x) = reduceOneStep p x
-reduci p Done = Done
-
-
 res2Exp :: Result Exp -> Exp
 res2Exp (ReducesTo e) = e
+
+--reduci :: ProgramDef -> Result Exp-> Result Exp
+--reduci p (ReducesTo x) = reduceOneStep p x
+--reduci p Done = Done
+
+
 
