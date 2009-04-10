@@ -64,7 +64,7 @@ op2Func Sub = (-)
 rifZ :: (Exp, Result Exp) -> (Exp, Result Exp) -> (Exp, Result Exp) -> (Exp, Result Exp)
 rifZ (e1, ReducesTo x) (e2, _) (e3, _) = (IfZero e1 e2 e3, ReducesTo (IfZero x e2 e3))
 rifZ ((Const 0), Done) (e2, _) (e3, _) = (IfZero (Const 0) e2 e3, ReducesTo e2)
-rifZ (e1, Done) (e2, _) (e3, _) = (IfZero e1 e2 e3, ReducesTo e3)
+rifZ ((Const x), Done) (e2, _) (e3, _) = (IfZero (Const x) e2 e3, ReducesTo e3)
 
 
 rLet :: VarId -> (Exp, Result Exp) -> (Exp, Result Exp) -> (Exp, Result Exp)
