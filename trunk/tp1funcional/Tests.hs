@@ -39,7 +39,9 @@ definiciones = makeDict [
 	" ifzero x  	\
 	\ then 3 	\
 	\ else 		\
-	\ 2"
+	\ 2",
+	def "varLibre(y)"
+	"y + y"
   ]
 
 main1 = parser "fact(5)"
@@ -55,7 +57,7 @@ main9 = parser "let x=5 in leticia(1,2,3)"
 main10 = parser "let x=5 in leticia(1,x,3)"
 main11 = parser "sellama(2)"
 main12 = parser "suma(2,3)"
-
+main13 = parser "let y=3 in varLibre(2)"
 
 
 testBV = (runTestTT.test) testCBV
@@ -77,8 +79,8 @@ testcases :: [(ProgramDef, Exp, Int)]
 testcases =  [ ( definiciones, main1,  120)
 		, ( definiciones, main2  , 5)
 --		, ( definiciones, main3, 4) 
---		, ( definiciones, main4, 4) 
---		, ( definiciones, main5, 4)
+		, ( definiciones, main4, 4) 
+		, ( definiciones, main5, 11)
 		, ( definiciones, main6 , 3) 
 		, ( definiciones, main7 , 4)
 		, ( definiciones, main8 , 6)
@@ -86,6 +88,7 @@ testcases =  [ ( definiciones, main1,  120)
 		, ( definiciones, main10,  39)
 		, ( definiciones, main11, 2)
 		, ( definiciones, main12, 5)
+		, ( definiciones, main13, 4)
 		 ]
 
 testCBV = map (\(a,b,c) -> (eval a b ~=? c) ) testcases
