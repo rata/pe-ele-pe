@@ -25,7 +25,7 @@ removeDict (DD f) nk = DD g
 makeDict :: Eq key => [(key, val)] -> Dict key val
 makeDict xs = DD (\x -> (foldr (f x) Nothing xs ))
 		where f _ _ (Just a) = Just a
-		      f x k Nothing | (fst k) == x = Just (snd(k))
+		      f x k Nothing | (fst k) == x = Just (snd k)
 		      	            | otherwise    = Nothing
 
 --makeDict :: Eq key => [(key, val)] -> Dict key val
