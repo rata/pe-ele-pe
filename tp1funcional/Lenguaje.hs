@@ -30,18 +30,17 @@ data FuncDef = FuncDef [VarId] Exp
 
 -- *** Ejercicio 2 ***
 
-
 foldExp :: (Value -> b) -> (VarId -> b ) -> (Op -> b -> b -> b) -> ( b -> b -> b -> b) ->  (VarId -> b -> b -> b) -> (FuncId  -> [b] -> b) -> Exp -> b
-foldExp fC _ _ _ _ _       (Const v)         = fC v
-foldExp _  fV _ _ _ _      (Var v)           = fV v
-foldExp fC fV fB fI fL fCa (BinOp o e1 e2)   = fB o (rec e1) (rec e2)
+foldExp fC _ _ _ _ _       (Const v) = fC v
+foldExp _  fV _ _ _ _      (Var v)   = fV v
+foldExp fC fV fB fI fL fCa exp = 
+	case exp of
+		BinOp o e1 e2   -> fB o (rec e1) (rec e2)
+		IfZero e1 e2 e3 -> fI (rec e1) (rec e2) (rec e3)
+		Let v e1 e2     -> fL v (rec e1) (rec e2)
+		Call f e1s      -> fCa f (map rec e1s)
 	where rec = foldExp fC fV fB fI fL fCa
-foldExp fC fV fB fI fL fCa (IfZero e1 e2 e3) = fI (rec e1) (rec e2) (rec e3)
-	where rec = foldExp fC fV fB fI fL fCa
-foldExp fC fV fB fI fL fCa (Let v e1 e2)     = fL v (rec e1) (rec e2)
-	where rec = foldExp fC fV fB fI fL fCa
-foldExp fC fV fB fI fL fCa (Call f e1s)      = fCa f (map rec e1s)
-	where rec = foldExp fC fV fB fI fL fCa
+
 
 -- Funciones útiles
 op2Func ::Num a => Op -> a -> a -> a
