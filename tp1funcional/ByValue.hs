@@ -14,24 +14,15 @@ eval :: ProgramDef -> Exp -> Value
 eval p e = eval' p e emptyDict
 
 eval' :: ProgramDef -> Exp -> Environment -> Value
-eval' p e en = (foldExp const getVar binOp ifZ fLet  (call p) e ) en
+eval' p e en = foldExp const getVar binOp ifZ fLet (call p) e en
 
 
 getVar :: VarId -> Environment -> Value
 getVar v = \en -> fromJust (lookupDict en v)
--- fromJust.(flip lookupDict) v
 
---binOp :: Op -> (Environment -> Value) -> (Environment -> Value) -> (Environment -> Value)
---binOp op a b = binOp' op (seq b a) b
 binOp :: Op -> (Environment -> Value) -> (Environment -> Value) -> Environment -> Value
---binOp Add f g en = (+) (f en) (g en)
---binOp Mul f g en = (*) (f en) (g en)
---binOp Sub f g en = (-) (f en) (g en)
-binOp Add f g = \en -> forceBV (+) (f en) (g en)
-binOp Mul f g = \en -> forceBV (*) (f en) (g en)
-binOp Sub f g = \en -> forceBV (-) (f en) (g en)
+binOp op f g = \en -> forceBV (op2Func op) (f en) (g en)
 --Hay que forzarlo a calcular los dos sumandos y luego sumar
-
 
 forceBV :: (a -> b -> c) -> a -> b -> c
 forceBV f a b = f (seq b a) b
@@ -39,6 +30,7 @@ forceBV f a b = f (seq b a) b
 ifZ :: (Environment -> Value) -> (Environment -> Value) -> (Environment -> Value) -> Environment -> Value
 ifZ v1 v2 v3 en = ifZ' (v1 en) (v2 en) (v3 en)
 
+-- Al hacer pattern matching con 0 nos aseguramos que evalue la expresion
 ifZ' :: Value -> a -> a -> a
 ifZ' 0 v2 _  = v2
 ifZ' _ _  v3 = v3 
@@ -54,12 +46,4 @@ call p f fs en = eval' p (getExp defFunc) nen
 
 extendDictByV :: Eq a => (Dict a b) -> a -> b -> (Dict a b)
 extendDictByV d k v = seq v (extendDict d k v)
-
--- type ProgramDef = Dict FuncId FuncDef
--- data FuncDef = FuncDef [VarId] Exp
-
-getExp :: FuncDef -> Exp
-getExp (FuncDef _ exp) = exp
-getParms :: FuncDef -> [VarId]
-getParms (FuncDef ls _ ) = ls
 

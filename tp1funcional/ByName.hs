@@ -55,12 +55,6 @@ rBinOp op (e1, ReducesTo x)  (e2, _) = ((BinOp op e1 e2), ReducesTo (BinOp op x 
 rBinOp op (e1, Done)  (e2, ReducesTo x) = ((BinOp op e1 e2), ReducesTo (BinOp op e1 x))
 rBinOp op (Const e1, Done)  (Const e2, Done) = ((BinOp op (Const e1) (Const e2)), ReducesTo (Const ((op2Func op) e1 e2)))
 
--- Este podria estar en lenguaje y mejorar el binOp' de btvalue
-op2Func ::Num a => Op -> a -> a -> a
-op2Func Add = (+)
-op2Func Mul = (*)
-op2Func Sub = (-)
-
 rifZ :: (Exp, Result Exp) -> (Exp, Result Exp) -> (Exp, Result Exp) -> (Exp, Result Exp)
 rifZ (e1, ReducesTo x) (e2, _) (e3, _) = (IfZero e1 e2 e3, ReducesTo (IfZero x e2 e3))
 rifZ ((Const 0), Done) (e2, _) (e3, _) = (IfZero (Const 0) e2 e3, ReducesTo e2)
@@ -79,12 +73,6 @@ rCall p f xs = (Call f params, g)
 		defFunc = fromJust (lookupDict p f)
 		params = fst (unzip xs)
 
-
-getExp :: FuncDef -> Exp
-getExp (FuncDef _ exp) = exp
-getParms :: FuncDef -> [VarId]
-getParms (FuncDef ls _ ) = ls
-
 -- *** Ejercicio 7 ***
 
 -- Reduce la expresión a forma normal, aplicando
@@ -99,10 +87,4 @@ reduce p e = getValue (res2Exp (last (tk)))
 				
 res2Exp :: Result Exp -> Exp
 res2Exp (ReducesTo e) = e
-
---reduci :: ProgramDef -> Result Exp-> Result Exp
---reduci p (ReducesTo x) = reduceOneStep p x
---reduci p Done = Done
-
-
 

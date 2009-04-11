@@ -43,3 +43,14 @@ foldExp fC fV fB fI fL fCa (Let v e1 e2)     = fL v (rec e1) (rec e2)
 foldExp fC fV fB fI fL fCa (Call f e1s)      = fCa f (map rec e1s)
 	where rec = foldExp fC fV fB fI fL fCa
 
+-- Funciones útiles
+op2Func ::Num a => Op -> a -> a -> a
+op2Func Add = (+)
+op2Func Mul = (*)
+op2Func Sub = (-)
+
+getExp :: FuncDef -> Exp
+getExp (FuncDef _ exp) = exp
+
+getParms :: FuncDef -> [VarId]
+getParms (FuncDef ls _ ) = ls
