@@ -34,6 +34,9 @@ definiciones = makeDict [
 	def "primero(x,y)"
 		"x",
 
+	def "segundo(x,y)"
+		"y",
+
 	def "suma(x,y)"
 		"x + y",
 
@@ -73,6 +76,8 @@ main12 = parser "suma(2,3)"
 main13 = parser "let y=3 in varLibre(2)"
 main14 = parser "( fact(4) * 5 ) + 30"
 main15 = parser "llamaA(8)"
+main16 = parser "ifzero ( 0 * colgate(5) ) then 98 else 5"
+main17 = parser "segundo(colgate(5), 4)"
 
 testBV = (runTestTT.test) testCBV
 testBN = (runTestTT.test) testCBN
@@ -91,9 +96,12 @@ testcases =  [	  ( definiciones, main0,  7)
 		, ( definiciones, main13, 4)
 		, ( definiciones, main14, 150)
 		, ( definiciones, main15, 8)
---Casos que se cuelgan
+--Casos que se cuelgan caso 14 en adelante
+		, ( definiciones, main17, 4)
 		, ( definiciones, main5, 11)
 		, ( definiciones, main3, 4) 
+--A partir de acá se cuelgan los dos
+		, ( definiciones, main16, 13)
 		, ( definiciones, main4, 4)
 	 	 ]
 
