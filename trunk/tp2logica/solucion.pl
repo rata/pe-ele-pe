@@ -9,8 +9,10 @@
 
 %% Ejercicio 1
 
-% dimension(+Tablero, -N, -M).
+%dimension(+Tablero, -N, -M).
+dimension(Tablero, N, M):- length(Tablero, N), nth0(0, Tablero, L), length(L, M).
 % posicion(+Tablero, -I, -J).
+posicion(Tablero, I, J):- dimension(Tablero, N, M), between(0, N, I), between(0, M, J).
 
 
 %% Ejercicio 2
