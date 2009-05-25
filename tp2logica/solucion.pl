@@ -12,7 +12,10 @@
 %dimension(+Tablero, -N, -M).
 dimension(T, N, M):- length(T, N), nth0(0, T, L), length(L, M).
 %dimension(T, N, M):- length(T, N) , N1 is N-1, forall( between(0,N1,X), (nth0(X,T,L), length(L, M)) ).
-%dimension(T, N, M):- length(T, N) , forall( member(X,T), length(X,M) ).
+%dimension(T, N, M):- length(T, N), nth0(0,T,L), length(L,M) ,forall( member(X,T), length(X,M) ).
+%dimension(T, N, M):- length(T, N), nth0(0,T,L), length(L,M), checkCols(T,1,N,L).
+
+
 
 % posicion(+Tablero, -I, -J).
 posicion(T, I, J):- dimension(T, N, M), between(0, N, I), between(0, M, J).
@@ -49,7 +52,7 @@ transponer(T, Trans):- transponerAux(T, Trans, 0).
 transponerAux(T,Trans,I):- dimension(T, N, M), I>=M, Trans=[].
 transponerAux(T,Trans,I):- dimension(T, N, M), I< M, I1 is I+1, transponerAux(T, Rec, I1), getCol(T, I, Col),
 				Trans = [Col|Rec].
-
+		
 %getCol(T,C,L):- dimension(T,N,M), C < M, getColAux(T,C,0,L).
 getCol(T,C,L):- getColAux(T,C,0,L).
 
@@ -59,6 +62,23 @@ getColAux(T,C,I,L):- dimension(T,N,M), I< N, I1 is I+1, getColAux(T, C, I1, L1),
 %% Ejercicio 4
 
 % asignarPeso(+Silueta, +Peso, -SiluetaConPeso).
+%asignarPeso(S, P, SP):- %dimension(S,F,C),F1 is F-1, C1 is C-1, 
+%			forall(
+%				(between(0,1,I), between(0,1,J), elemento(S,I,J,E)), 
+%						nonvar(E) -> elemento(SP,I,J,P) ; true 
+%				).
+
+% asignarPeso(+Silueta, +Peso, -SiluetaConPeso).
+asignarPeso(S, P, SP):- asignarAux(S,0,P,SP).
+
+asignarAux(S,I,P,SP):- dimension(S,N,M), I>=N, SP=[].
+asignarAux(S,I,P,SP):- dimension(S,N,M), I< N, IR is I+1, asignarAux(S, IR, P, LR), nth0(I, S, F), reformado(F,P,C),
+				SP=[C|LR].
+
+reformado([],P,C):- C = [].
+reformado([L|LS],P,[C|CS]):- reformado(LS,P,CS), ((nonvar(L), C = P )| var(L)).
+
+elemento(S,I,J,E):- nth0(I,S,R), nth0(J,R,E).
 
 
 %% Ejercicio 5
