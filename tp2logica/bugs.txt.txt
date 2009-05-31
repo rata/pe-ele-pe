@@ -1,0 +1,8 @@
+El subtablero fuera de rango da [[],[]...]
+
+63 ?- subtablero([[1,2],[3,4]],0,2,X).
+X = [[], []] ;
+false.
+
+Ver de reemplazar el between con -1 por posicion
+

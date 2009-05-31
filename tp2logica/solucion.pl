@@ -10,15 +10,19 @@
 %% Ejercicio 1
 
 %dimension(+Tablero, -N, -M).
-dimension(T, N, M):- length(T, N), nth0(0, T, L), length(L, M).
+dimension(T,N,M):- nonvar(T), dimensionNonvar(T,N,M).
+dimension(T,N,M):- var(T), dimensionVar(T,N,M).
+dimensionNonvar(T, N, M):- length(T, N), nth0(0, T, L), length(L, M).
+dimensionVar(T, N, M):- length(T, N), repetir(N,M,X), maplist(length,T,X).
 %dimension(T, N, M):- length(T, N) , N1 is N-1, forall( between(0,N1,X), (nth0(X,T,L), length(L, M)) ).
 %dimension(T, N, M):- length(T, N), nth0(0,T,L), length(L,M) ,forall( member(X,T), length(X,M) ).
 %dimension(T, N, M):- length(T, N), nth0(0,T,L), length(L,M), checkCols(T,1,N,L).
 
-
+repetir(0,N,[]).
+repetir(I,N,[N|M]):- I > 0, I1 is I-1, repetir(I1,N,M).
 
 % posicion(+Tablero, -I, -J).
-posicion(T, I, J):- dimension(T, N, M), between(0, N, I), between(0, M, J).
+posicion(T, I, J):- dimension(T, N, M), N1 is N-1, M1 is M-1, between(0, N1, I), between(0, M1, J).
 
 
 %% Ejercicio 2
@@ -83,7 +87,25 @@ elemento(S,I,J,E):- nth0(I,S,R), nth0(J,R,E).
 
 %% Ejercicio 5
 
-% ubicarSilueta(+Silueta, -I, -J, -Tablero).
+%ubicarSilueta(+Silueta, -I, -J, -Tablero).
+ubicarSilueta(S, I, J, T):- posicion(T,I,J), subtablero(T,I,J,ST), entraSiluetaArriba(S,ST).
+
+%rellenarSilueta(S, N, M, SR):- dimension(S, N1, M1), N >= N1, M >= M1.
+%rellenarSilueta(S, N, M, SR):- dimension(S, N1, M1), N < N1, M < M1, dimension(SR,N,M) .
+
+entraSiluetaArriba(S,T):- length(S,LS), length(T,LT), LS =< LT, L is LT-LS, recortar(T,L,TR), maplist(entraFila,S,TR).
+%entraSiluetaArriba(S,T):- length(S,LS), length(T,LT), LS = LT, maplist(entraFila,S,T).
+
+%entraFila(R,N):-maplist(entraCelda,R,N).
+entraFila(S,T):- length(S,LS), length(T,LT), LS =< LT, L is LT-LS, recortar(T,L,TR), maplist(entraCelda,S,TR).
+%entraFila(S,T):- length(S,LS), length(T,LT), LS = LT, maplist(entraCelda,S,T).
+
+%recortar(+List,+N,?List)
+recortar(L,N,R):- reverse(L,RL), sacarN(N,RL,RLR), reverse(RLR,R).
+
+entraCelda(X,Y):-nonvar(X) -> var(Y) ; true.
+
+
 
 
 %% Ejercicio 6
