@@ -79,7 +79,7 @@ asignarAux(S,I,P,SP):- dimension(S,N,M), I>=N, SP=[].
 asignarAux(S,I,P,SP):- dimension(S,N,M), I< N, IR is I+1, asignarAux(S, IR, P, LR), nth0(I, S, F), reformado(F,P,C),
 				SP=[C|LR].
 
-reformado([],P,C):- C = [].
+reformado([],P,[]).
 reformado([L|LS],P,[C|CS]):- reformado(LS,P,CS), ((nonvar(L), C = P )| var(L)).
 
 elemento(S,I,J,E):- nth0(I,S,R), nth0(J,R,E).
@@ -89,9 +89,6 @@ elemento(S,I,J,E):- nth0(I,S,R), nth0(J,R,E).
 
 %ubicarSilueta(+Silueta, -I, -J, -Tablero).
 ubicarSilueta(S, I, J, T):- posicion(T,I,J), subtablero(T,I,J,ST), entraSiluetaArriba(S,ST).
-
-%rellenarSilueta(S, N, M, SR):- dimension(S, N1, M1), N >= N1, M >= M1.
-%rellenarSilueta(S, N, M, SR):- dimension(S, N1, M1), N < N1, M < M1, dimension(SR,N,M) .
 
 entraSiluetaArriba(S,T):- length(S,LS), length(T,LT), LS =< LT, L is LT-LS, recortar(T,L,TR), maplist(entraFila,S,TR).
 %entraSiluetaArriba(S,T):- length(S,LS), length(T,LT), LS = LT, maplist(entraFila,S,T).
@@ -106,19 +103,32 @@ recortar(L,N,R):- reverse(L,RL), sacarN(N,RL,RLR), reverse(RLR,R).
 entraCelda(X,Y):-nonvar(X) -> var(Y) ; true.
 
 
-
-
 %% Ejercicio 6
 
 % ubicarPieza(+NombrePieza, +Peso, +DiccionarioPiezas, -I, -J, -Tablero).
+ubicarPieza(NP, P, DP, I, J, T):- member(orientacion(NP,S),DP), asignarPeso(S,P,SP), ubicarSilueta(SP,I,J,T), tieneSilueta(SP,I,J,T).
+
+tieneSilueta(S, I, J, T):- posicion(T,I,J), subtablero(T,I,J,ST), matchSiluetaArriba(S,ST).
+
+matchSiluetaArriba(S,T):- length(S,LS), length(T,LT), LS =< LT, L is LT-LS, recortar(T,L,TR), maplist(matchFila,S,TR).
+
+matchFila(S,T):- length(S,LS), length(T,LT), LS =< LT, L is LT-LS, recortar(T,L,TR), maplist(igualCelda,S,TR).
+
+igualCelda(X,Y):- nonvar(X) -> Y is X ; true.
 
 
 %% Ejercicio 7
 % solucionValida(-Juego).
-
+solucionValida(juego(T,RF,RC)):- dimension(T,N,M), length(RF,N), length(RC,M), maplist(sumlist,T,RF), transponer(T,TT), maplist(sumlist,TT,RC).
 
 %% Ejercicio 8
 % resolver(+DiccionarioPiezas, +PiezasDisponibles, -Juego).
+%resolver(DiccP, PDisp, juego(T,RF,RC)):- forall(member(pieza(Nom,Peso),PDisp) , ubicarPieza(Nom,Peso,DiccP,I,J,T) ), solucionValida(juego(T,RF,RC)) .
+
+resolver(DiccP, [pieza(Nomb,Peso)|PDisp], juego(T,RF,RC)):- ubicarPieza(Nom,Peso,DiccP,I,J,T), resolver(DiccP, PDisp, juego(T,RF,RC)) .
+resolver(DiccP, [], juego(T,RF,RC)):- solucionValida(juego(T,RF,RC)).
+
+%juego2(Juego) , algunasPiezas(DiccPiezas) ,PiezasDisponibles = [pieza(ese , 2), pieza(ele , 3), pieza(ese , 1)] ,resolver(DiccPiezas, PiezasDisponibles , Juego) , mostrarJuego(Juego).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
