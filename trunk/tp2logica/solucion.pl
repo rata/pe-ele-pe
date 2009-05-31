@@ -93,7 +93,6 @@ ubicarSilueta(S, I, J, T):- posicion(T,I,J), subtablero(T,I,J,ST), entraSiluetaA
 entraSiluetaArriba(S,T):- length(S,LS), length(T,LT), LS =< LT, L is LT-LS, recortar(T,L,TR), maplist(entraFila,S,TR).
 %entraSiluetaArriba(S,T):- length(S,LS), length(T,LT), LS = LT, maplist(entraFila,S,T).
 
-%entraFila(R,N):-maplist(entraCelda,R,N).
 entraFila(S,T):- length(S,LS), length(T,LT), LS =< LT, L is LT-LS, recortar(T,L,TR), maplist(entraCelda,S,TR).
 %entraFila(S,T):- length(S,LS), length(T,LT), LS = LT, maplist(entraCelda,S,T).
 
@@ -128,7 +127,6 @@ solucionValida(juego(T,RF,RC)):- dimension(T,N,M), length(RF,N), length(RC,M), m
 resolver(DiccP, [pieza(Nomb,Peso)|PDisp], juego(T,RF,RC)):- ubicarPieza(Nom,Peso,DiccP,I,J,T), resolver(DiccP, PDisp, juego(T,RF,RC)) .
 resolver(DiccP, [], juego(T,RF,RC)):- solucionValida(juego(T,RF,RC)).
 
-%juego2(Juego) , algunasPiezas(DiccPiezas) ,PiezasDisponibles = [pieza(ese , 2), pieza(ele , 3), pieza(ese , 1)] ,resolver(DiccPiezas, PiezasDisponibles , Juego) , mostrarJuego(Juego).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

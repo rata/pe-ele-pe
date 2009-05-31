@@ -6,3 +6,8 @@ false.
 
 Ver de reemplazar el between con -1 por posicion
 
+Asumimos que las siluetas tienen la dimension minima en todo sentido
+
+Asumimos que la resolucion del juego debe hacerse con todas las piezas de la lista usando una sola vez c/u
+
+ver de usar dimension en todos lados
