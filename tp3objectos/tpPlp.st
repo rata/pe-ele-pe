@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <st-source>
-<time-stamp>From VisualWorks® NonCommercial, 7.6 of March 3, 2008 on June 20, 2009 at 3:48:38 pm</time-stamp>
+<time-stamp>From VisualWorks® NonCommercial, 7.6 of March 3, 2008 on June 20, 2009 at 4:09:35 pm</time-stamp>
 <!-- Package Zplp* -->
 
 
@@ -219,6 +219,10 @@ Instance Variables:
 <body package="Zplp" selector="afterValue:withResult:on:">afterValue: aValue withResult: res on: old
 	
 	^value = aValue &amp; (backup = (old at: 'value'))</body>
+
+<body package="Zplp" selector="afterRestoreWithResult:on:">afterRestoreWithResult: res on: old
+	
+	^backup = nil &amp; (value = (old at: 'backup'))</body>
 </methods>
 
 
@@ -298,7 +302,8 @@ Instance Variables:
 		withArguments: args)
 		ifFalse:
 			[(Error new)
-				errorString: 'No se cumple la postcondicion';
+				errorString:
+						'No se cumple la postcondicion de ' , aMessage selector asString;
 				raise]</body>
 
 <body package="Zplp" selector="llamarPre:">llamarPre: aMessage
@@ -308,7 +313,8 @@ Instance Variables:
 		withArguments: aMessage arguments)
 		ifFalse:
 			[(Error new)
-				errorString: 'No se cumple la precondicion';
+				errorString:
+						'No se cumple la precondicion de ' , aMessage selector asString;
 				raise]</body>
 </methods>
 
